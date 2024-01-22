@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	manage "go-licensemanage"
+	manage "github.com/xslasd/go-licensemanage"
 	"os"
 	"strconv"
 	"time"
