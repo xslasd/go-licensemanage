@@ -13,8 +13,8 @@ client Main implementation interfaces
 ```go
 type LicenseCli interface {
 	GenerateActivationCode(opts ...GenerateOption) ([]byte, error)
-	ActivateLicense(licenseCode []byte) (bool, error)
-	VerifyLicense() (bool, error)
+	ActivateLicense(licenseCode []byte) error
+	VerifyLicense() bool
 	GetLicenseInfo() (*LicenseInfo, error)
 }
 ```
