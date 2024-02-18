@@ -23,7 +23,7 @@ type manage struct {
 }
 type Option func(*manage)
 
-func WhitOAEPHash(h hash.Hash) Option {
+func WithOAEPHash(h hash.Hash) Option {
 	return func(config *manage) {
 		config.h = h
 	}
@@ -31,25 +31,25 @@ func WhitOAEPHash(h hash.Hash) Option {
 
 // WhitPollVerifyTime Set the automatic polling time for license verification, with a default of 24 hours.
 // Please use ParseDuration parses a duration string.
-func WhitPollVerifyTime(pollVerifyTime string) Option {
+func WithPollVerifyTime(pollVerifyTime string) Option {
 	return func(config *manage) {
 		config.pollVerifyTime = pollVerifyTime
 	}
 }
 
 // WhitLicenseLimitHandler Add processors with license restrictions。
-func WhitLicenseLimitHandler(handler LicenseLimitHandler) Option {
+func WithLicenseLimitHandler(handler LicenseLimitHandler) Option {
 	return func(config *manage) {
 		config.licenseLimitHandler = handler
 	}
 }
 
-func WhitLicenseEncryptFunc(fn LicenseEncryptFunc) Option {
+func WithLicenseEncryptFunc(fn LicenseEncryptFunc) Option {
 	return func(config *manage) {
 		config.licenseEncryptFunc = fn
 	}
 }
-func WhitActivationDecryptFunc(fn ActivationDecryptFunc) Option {
+func WithActivationDecryptFunc(fn ActivationDecryptFunc) Option {
 	return func(config *manage) {
 		config.activationDecryptFunc = fn
 	}
