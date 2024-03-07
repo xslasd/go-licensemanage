@@ -9,7 +9,10 @@ import (
 	"crypto/x509"
 	"encoding/binary"
 	"encoding/pem"
+	"errors"
 )
+
+var ActivationCodeFileErr = errors.New("ActivationCodeFileErr")
 
 const pwdbit = 10
 
@@ -36,8 +39,14 @@ func (m manage) encrypt(plainText []byte, publicKey []byte) ([]byte, error) {
 	return res, nil
 }
 func (m manage) decrypt(cipherByte []byte, privateKey []byte) ([]byte, error) {
+	if len(cipherByte) < pwdbit {
+		return nil, ActivationCodeFileErr
+	}
 	pwdLenByte := cipherByte[:pwdbit]
 	pwdLen := bytesToInt(pwdLenByte)
+	if len(cipherByte) < pwdbit+pwdLen {
+		return nil, ActivationCodeFileErr
+	}
 	passwordEncrypt := cipherByte[pwdbit : pwdLen+pwdbit]
 	ciphertext := cipherByte[pwdbit+pwdLen:]
 	block, _ := pem.Decode(privateKey)
