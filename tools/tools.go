@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+const OnlineUsers_ItemKey = "online_Users"
+
 func main() {
 	var generateRSAKey bool
 	flag.BoolVar(&generateRSAKey, "GenerateRSAKey", false, "Generate RSA Key")
@@ -17,9 +19,11 @@ func main() {
 	var expiryTime int64
 	var activationDecryptKeyDir string
 	var licenseEncryptKeyDir string
+	var onlineUsersLimit int64
 
 	flag.StringVar(&activationCodeDir, "ActivationCodeDir", "../../client/example/activation_code.key", "Set activate file dir")
 	flag.Int64Var(&expiryTime, "ExpiryTime", -1, "License expiration time, such as 20240130")
+	flag.Int64Var(&onlineUsersLimit, "OnlineUsersLimit", -1, "Online user limit")
 	flag.StringVar(&activationDecryptKeyDir, "ActivationDecryptKeyDir", "./.manage_key/activation_decrypt.pem", "Set decrypt activation private key file directory")
 	flag.StringVar(&licenseEncryptKeyDir, "LicenseEncryptKeyDir", "./.manage_key/license_encrypt.pem", "Set encrypt license public key file directory")
 	flag.Parse()
@@ -91,10 +95,21 @@ func main() {
 		}
 		expiryTime = t.UnixMilli()
 	}
-	b, err := manage.GenerateLicense(manage.RSAKeyConfig{
-		ActivationDecryptKey: activationDecryptkey,
-		LicenseEncryptKey:    licenseEncryptkey,
-	}, activationCode, expiryTime)
+	b, err := manage.GenerateLicense(
+		manage.RSAKeyConfig{
+			ActivationDecryptKey: activationDecryptkey,
+			LicenseEncryptKey:    licenseEncryptkey,
+		},
+		activationCode,
+		expiryTime,
+		manage.WithLicenseLimitHandler(func(activationInfo manage.ActivationInfo, data *manage.LicenseInfo) error {
+			fmt.Println(activationInfo)
+			if onlineUsersLimit > 0 {
+				data.ActivationChecks[OnlineUsers_ItemKey] = onlineUsersLimit
+			}
+			return nil
+		}),
+	)
 	if err != nil {
 		panic(err)
 	}
