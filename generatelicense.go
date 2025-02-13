@@ -5,7 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"hash"
+	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type LicenseLimitHandler func(activationInfo ActivationInfo, data *LicenseInfo) error
@@ -63,6 +66,7 @@ type ActivationInfo struct {
 }
 
 type LicenseInfo struct {
+	LicenseKey       string         `json:"license_key" form:"license_key"`
 	Subject          string         `json:"subject"`
 	Description      string         `json:"description,omitempty"`
 	IssuedTime       int64          `json:"issued_time"`
@@ -108,6 +112,7 @@ func GenerateLicense(rsaKey RSAKeyConfig, activationCode []byte, expiryTime int6
 	}
 
 	res := new(LicenseInfo)
+	res.LicenseKey = strings.ReplaceAll(uuid.NewString(), "-", "")
 	res.Subject = activationInfo.Subject
 	res.Description = activationInfo.Description
 	res.InvitationCode = activationInfo.InvitationCode
@@ -121,7 +126,6 @@ func GenerateLicense(rsaKey RSAKeyConfig, activationCode []byte, expiryTime int6
 			return nil, err
 		}
 	}
-
 	data, err := json.Marshal(res)
 	if err != nil {
 		return nil, err
